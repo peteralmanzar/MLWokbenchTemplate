@@ -96,64 +96,6 @@ class PipelineFeatureStandardScaler(BaseEstimator, TransformerMixin):
         X[self.columns] = self.scaler.transform(X[self.columns])
         return X
 
-class PipelineDataSplit(BaseEstimator, TransformerMixin):
-    """
-    DataSplit is a custom transformer that splits a DataFrame into training and testing sets.
-
-    Parameters
-    ----------
-    labelColumns : list
-        A list of column names to use as labels.
-    testSize : float
-        The proportion of the dataset to include in the test split.
-    randomState : int
-        The seed used by the random number generator.
-
-    Returns
-    -------
-    tuple
-        A tuple containing the training and testing sets.
-    """
-
-    def __init__(self, labelColumns: List[str], testSize: float = 0.2, randomState: int = 42):
-        self.labelColumns = labelColumns
-        self.testSize = testSize
-        self.randomState = randomState
-
-    def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'DataSplit':
-        return self
-    
-    def transform(self, X: DataFrame) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
-        y = X[self.labelColumns]
-        X = X.drop(self.labelColumns, axis=1)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.testSize, random_state=self.randomState)
-        return X_train, X_test, y_train, y_test
-
-class DatasplitToNumpyArray(BaseEstimator, TransformerMixin):
-    """
-    DatasplitToNumpyArray is a custom transformer that converts the data split into numpy arrays.
-    It takes a tuple of DataFrames as input and returns a tuple of numpy arrays.
-
-    Parameters
-    ----------
-    X : tuple
-        A tuple of DataFrames containing the training and testing data.
-    y : DataFrame
-        A DataFrame containing the target data.
-
-    Returns
-    -------
-    tuple
-        A tuple of numpy arrays containing the training and testing data.
-    """
-
-    def fit(self, X: Tuple[DataFrame, DataFrame, DataFrame, DataFrame], y: Union[DataFrame, None] = None) -> 'DatasplitToNumpyArray':
-        return self
-    
-    def transform(self, X: Tuple[DataFrame, DataFrame, DataFrame, DataFrame]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        X_train, X_test, y_train, y_test = X
-        return X_train.to_numpy(), X_test.to_numpy(), y_train.to_numpy(), y_test.to_numpy()
-
 class PipelineDateSpliter(BaseEstimator, TransformerMixin):
     """
     PipelineDateSpliter is a custom transformer that splits date columns into day, month, and year columns.
@@ -250,3 +192,12 @@ class PipelineSequencer(BaseEstimator, TransformerMixin):
                         
         label_df = pd.DataFrame(sequencedy, columns=['label'])
         return sequencedX, label_df
+    
+def splitData(data: DataFrame, target: str, test_size: float = 0.2, seed: int = 42) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
+    X = data.drop(target, axis=1)
+    y = data[target]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seed, stratify=y)
+    return X_train, X_test, y_train, y_test
+
+def dataSplitToNumpyArray(X_train: DataFrame, X_test: DataFrame, y_train: DataFrame, y_test: DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    return X_train.to_numpy(), X_test.to_numpy(), y_train.to_numpy(), y_test.to_numpy()

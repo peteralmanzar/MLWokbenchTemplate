@@ -1,8 +1,9 @@
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, Conv2D, Dense, Dropout, Flatten, LSTM, MaxPooling1D, MaxPooling2D
 from enum import Enum
+from keras.models import Model
+from tensorflow.keras.layers import Conv1D, Conv2D, Dense, Dropout, Flatten, LSTM, MaxPooling1D, MaxPooling2D
+from tensorflow.keras.models import Sequential
 
-def GetModelTemplateMLPRegression(numberOfFeatures: int):
+def GetModelTemplateMLPRegression(numberOfFeatures: int) -> Model:
     '''
     Returns a template for a Multi-Layer Perceptron (MLP) model for regression tasks.
     '''
@@ -16,7 +17,7 @@ def GetModelTemplateMLPRegression(numberOfFeatures: int):
 
     return model
 
-def GetModelTemplateMLPClassification(numberOfFeatures: int):
+def GetModelTemplateMLPClassification(numberOfFeatures: int) -> Model:
     '''
     Returns a template for a Multi-Layer Perceptron (MLP) model for binary classification tasks.
     '''
@@ -30,7 +31,7 @@ def GetModelTemplateMLPClassification(numberOfFeatures: int):
 
     return model
 
-def GetModelTemplateMLPClassification(numberOfFeatures: int, num_classes: int):
+def GetModelTemplateMLPClassification(numberOfFeatures: int, num_classes: int) -> Model:
     '''
     Returns a template for a Multi-Layer Perceptron (MLP) model for multiple category classification tasks.
     '''
@@ -44,7 +45,7 @@ def GetModelTemplateMLPClassification(numberOfFeatures: int, num_classes: int):
 
     return model 
 
-def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int):
+def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int) -> Model:
     '''
     Returns a template for a Long Short-Term Memory (LSTM) model. Ideal for time series forecasting.
     '''
@@ -63,7 +64,7 @@ def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int):
 
     return model
 
-def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int):
+def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int) -> Model:
     '''
     Returns a template for a 1D Convolutional Neural Network (CNN) model. Ideal for time series forecasting.
     '''
@@ -81,7 +82,7 @@ def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int):
 
     return model
 
-def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int):
+def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int) -> Model:
     '''
     Returns a template for a 2D Convolutional Neural Network (CNN) model. Ideal for image classification tasks.
     '''
