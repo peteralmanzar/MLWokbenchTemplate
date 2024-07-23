@@ -15,6 +15,8 @@ def initModel() -> Model:
     '''
     Initializes model
     '''
+    # see mltoolkit for available model templates
+    # or create your own model
     pass
 
 # Define the preprocessing pipeline
@@ -24,6 +26,7 @@ def createPreprocessingPipeline() -> Pipeline:
     '''
     pipeline = Pipeline([
         # Add preprocessing steps here
+        # see mltoolkit for available transformers
     ])
 
     return pipeline;
