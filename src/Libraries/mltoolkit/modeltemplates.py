@@ -1,7 +1,10 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout, Flatten, Conv1D, MaxPooling1D, Conv2D, MaxPooling2D
+from tensorflow.keras.layers import Conv1D, Conv2D, Dense, Dropout, Flatten, LSTM, MaxPooling1D, MaxPooling2D
 
 def GetModelTemplateMLPRegression(numberOfFeatures: int):
+    '''
+    Returns a template for a Multi-Layer Perceptron (MLP) model for regression tasks.
+    '''
     model = Sequential([
         Dense(64, activation='relu', input_shape=(numberOfFeatures,)),
         Dense(64, activation='relu'),
@@ -11,6 +14,9 @@ def GetModelTemplateMLPRegression(numberOfFeatures: int):
     return model
 
 def GetModelTemplateMLPClassification(numberOfFeatures: int):
+    '''
+    Returns a template for a Multi-Layer Perceptron (MLP) model for classification tasks.
+    '''
     model = Sequential([
         Dense(64, activation='relu', input_shape=(numberOfFeatures,)),
         Dense(64, activation='relu'),
@@ -20,6 +26,9 @@ def GetModelTemplateMLPClassification(numberOfFeatures: int):
     return model
 
 def GetModelTemplateMLPClassification(numberOfFeatures: int, num_classes: int):
+    '''
+    Returns a template for a Multi-Layer Perceptron (MLP) model for classification tasks.
+    '''
     model = Sequential([
         Dense(64, activation='relu', input_shape=(numberOfFeatures,)),
         Dense(64, activation='relu'),
@@ -29,6 +38,9 @@ def GetModelTemplateMLPClassification(numberOfFeatures: int, num_classes: int):
     return model 
 
 def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int):
+    '''
+    Returns a template for a Long Short-Term Memory (LSTM) model. Ideal for time series forecasting.
+    '''
     model = Sequential([
         LSTM(64, return_sequences=True, input_shape=(numberOfSteps, numberOfFeatures)),
         Dropout(0.2),
@@ -43,6 +55,9 @@ def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int):
     return model
 
 def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int):
+    '''
+    Returns a template for a 1D Convolutional Neural Network (CNN) model. Ideal for time series forecasting.
+    '''
     model = Sequential([
         Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(numberOfSteps, numberOfFeatures)),
         MaxPooling1D(pool_size=2),
@@ -56,6 +71,9 @@ def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int):
     return model
 
 def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int):
+    '''
+    Returns a template for a 2D Convolutional Neural Network (CNN) model. Ideal for image classification tasks.
+    '''
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(image_height, image_width, 3)),
         MaxPooling2D((2, 2)),
