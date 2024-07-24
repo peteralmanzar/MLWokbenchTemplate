@@ -36,7 +36,7 @@ def saveModel(model: Model) -> None:
     joblib.dump(model, fileName)
     return fileName
 
-def saveData(Xtrain: DataFrame, yTrain: DataFrame) -> None:
+def saveData(Xtrain: DataFrame, yTrain: DataFrame, X_test: DataFrame, y_test: DataFrame) -> None:
     '''
     Save training data to file
 
@@ -72,14 +72,18 @@ def LoadModel(fileName: str) -> Model:
     '''
     return joblib.load(fileName)
 
-def LoadData(XtrainFileName: str, yTrainFileName: str) -> tuple[DataFrame, DataFrame]:
+def LoadData(XTrainFileName: str, yTrainFileName: str, XTestFileName: str, yTestFileName) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     '''
     Load training data from file
 
     Parameters:
     XtrainFileName (str): Name of the training data file
     yTrainFileName (str): Name of the training target file
+    XTestFileName (str): Name of the test data file
+    yTestFileName (str): Name of the test target file
     '''
-    Xtrain = pd.read_csv(XtrainFileName)
+    Xtrain = pd.read_csv(XTrainFileName)
     yTrain = pd.read_csv(yTrainFileName)
-    return Xtrain, yTrain
+    XTest = pd.read_csv(XTestFileName)
+    yTest = pd.read_csv(yTestFileName)
+    return Xtrain, yTrain, XTest, yTest

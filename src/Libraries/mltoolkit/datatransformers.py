@@ -1,3 +1,4 @@
+from enum import Enum
 import pandas as pd
 import numpy as np
 from pandas import DataFrame
@@ -5,6 +6,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder as SklearnOneHotEncoder, StandardScaler
 from typing import List, Tuple, Union
+
+class ImputeStrategy(Enum):
+    MEAN = 'mean'
+    MEDIAN = 'median'
+    MODE = 'mode'
 
 class PipelineOneHotEncoder(BaseEstimator, TransformerMixin):
     """
@@ -38,6 +44,58 @@ class PipelineOneHotEncoder(BaseEstimator, TransformerMixin):
         X = X.reset_index(drop=True)
         encoded_df = encoded_df.reset_index(drop=True)
         return X.join(encoded_df)
+
+class PipelineImputer(BaseEstimator, TransformerMixin):
+    """
+    PipelineImputer is a custom transformer that imputes missing values in columns using a specified strategy.
+    It takes a strategy and a list of columns to impute as parameters.
+
+    Parameters
+    ----------
+    strategy : ImputeStrategy
+        The imputation strategy to use.
+    columns : list
+        A list of column names to impute.
+
+    Returns
+    -------
+    DataFrame
+        A new DataFrame with the specified columns imputed.
+    """
+    def __init__(self, strategy: ImputeStrategy, columns: List[str]):
+        self.strategy = strategy
+        self.columns = columns
+
+    def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineImputer':
+        return self
+    
+    def transform(self, X: DataFrame) -> DataFrame:
+        for column in self.columns:
+            if column not in X.columns:
+                raise ValueError(f"Column '{column}' not found in DataFrame")
+                
+            if self.strategy == ImputeStrategy.MEAN:
+                if X[column].dtype.kind in 'biufc':  # Check if the column is of numeric type
+                    print(f"Imputing column '{column}' with mean value")
+                    X[column] = X[column].fillna(X[column].mean())
+                else:
+                    raise ValueError(f"Mean imputation is not suitable for column '{column}' with dtype {X[column].dtype}")
+            elif self.strategy == ImputeStrategy.MEDIAN:
+                if X[column].dtype.kind in 'biufc':  # Check if the column is of numeric type
+                    print(f"Imputing column '{column}' with median value")
+                    X[column] = X[column].fillna(X[column].median())
+                else:
+                    raise ValueError(f"Median imputation is not suitable for column '{column}' with dtype {X[column].dtype}")
+            elif self.strategy == ImputeStrategy.MODE:
+                mode_value = X[column].mode()
+                if not mode_value.empty:
+                    print(f"Imputing column '{column}' with mode value")
+                    X[column] = X[column].fillna(mode_value[0])
+                else:
+                    raise ValueError(f"No mode value found for column '{column}'")
+            else:
+                raise ValueError(f"Unsupported impute strategy: {self.strategy}")
+        return X
 
 class PipelineFeatureDropper(BaseEstimator, TransformerMixin):
     """

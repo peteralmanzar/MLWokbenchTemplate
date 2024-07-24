@@ -3,106 +3,6 @@ from keras.models import Model
 from tensorflow.keras.layers import Conv1D, Conv2D, Dense, Dropout, Flatten, LSTM, MaxPooling1D, MaxPooling2D
 from tensorflow.keras.models import Sequential
 
-def GetModelTemplateMLPRegression(numberOfFeatures: int) -> Model:
-    '''
-    Returns a template for a Multi-Layer Perceptron (MLP) model for regression tasks.
-    '''
-    model = Sequential([
-        Dense(64, activation=LayerActivation.RELU.value, input_shape=(numberOfFeatures,)),
-        Dense(64, activation=LayerActivation.RELU.value),
-        Dense(1)
-    ])
-
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_SQUARED_ERROR.value])  
-
-    return model
-
-def GetModelTemplateMLPClassification(numberOfFeatures: int) -> Model:
-    '''
-    Returns a template for a Multi-Layer Perceptron (MLP) model for binary classification tasks.
-    '''
-    model = Sequential([
-        Dense(64, activation=LayerActivation.RELU.value, input_shape=(numberOfFeatures,)),
-        Dense(64, activation=LayerActivation.RELU.value),
-        Dense(1, activation=LayerActivation.SIGMOID.value)
-    ])
-
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.BINARY_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
-
-    return model
-
-def GetModelTemplateMLPClassification(numberOfFeatures: int, num_classes: int) -> Model:
-    '''
-    Returns a template for a Multi-Layer Perceptron (MLP) model for multiple category classification tasks.
-    '''
-    model = Sequential([
-        Dense(64, activation=LayerActivation.RELU.value, input_shape=(numberOfFeatures,)),
-        Dense(64, activation=LayerActivation.RELU.value),
-        Dense(num_classes, activation=LayerActivation.SOFTMAX.value)
-    ])
-
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
-
-    return model 
-
-def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int) -> Model:
-    '''
-    Returns a template for a Long Short-Term Memory (LSTM) model. Ideal for time series forecasting.
-    '''
-    model = Sequential([
-        LSTM(64, return_sequences=True, input_shape=(numberOfSteps, numberOfFeatures)),
-        Dropout(0.2),
-        LSTM(64, return_sequences=True),
-        Dropout(0.2),
-        LSTM(32, return_sequences=True),
-        Dropout(0.2),
-        Dense(25, activation=LayerActivation.RELU.value),
-        Dense(1)
-    ])
-
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
-
-    return model
-
-def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int) -> Model:
-    '''
-    Returns a template for a 1D Convolutional Neural Network (CNN) model. Ideal for time series forecasting.
-    '''
-    model = Sequential([
-        Conv1D(filters=64, kernel_size=2, activation=LayerActivation.RELU.value, input_shape=(numberOfSteps, numberOfFeatures)),
-        MaxPooling1D(pool_size=2),
-        Conv1D(filters=64, kernel_size=2, activation=LayerActivation.RELU.value),
-        MaxPooling1D(pool_size=2),
-        Flatten(),
-        Dense(50, activation=LayerActivation.RELU.value),
-        Dense(1)
-    ])
-
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
-
-    return model
-
-def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int) -> Model:
-    '''
-    Returns a template for a 2D Convolutional Neural Network (CNN) model. Ideal for image classification tasks.
-    '''
-    model = Sequential([
-        Conv2D(32, (3, 3), activation=LayerActivation.RELU, input_shape=(image_height, image_width, 3)),
-        MaxPooling2D((2, 2)),
-        Conv2D(64, (3, 3), activation=LayerActivation.RELU),
-        MaxPooling2D((2, 2)),
-        Conv2D(128, (3, 3), activation=LayerActivation.RELU),
-        MaxPooling2D((2, 2)),
-        Flatten(),
-        Dense(512, activation=LayerActivation.RELU),
-        Dropout(0.5),
-        Dense(num_classes, activation=LayerActivation.SOFTMAX)
-    ])
-
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
-
-    return model
-
 class LayerActivation(Enum):
     RELU = 'relu'
     SIGMOID = 'sigmoid'
@@ -150,3 +50,103 @@ class Metric(Enum):
     BINARY_CROSSENTROPY = 'binary_crossentropy'
     POISSON = 'poisson'
     COSINE_SIMILARITY = 'cosine_similarity'
+
+def GetModelTemplateMLPRegression(numberOfFeatures: int) -> Model:
+    '''
+    Returns a template for a Multi-Layer Perceptron (MLP) model for regression tasks.
+    '''
+    model = Sequential([
+        Dense(64, activation=LayerActivation.RELU.value, input_shape=(numberOfFeatures,)),
+        Dense(64, activation=LayerActivation.RELU.value),
+        Dense(1)
+    ])
+
+    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_SQUARED_ERROR.value])
+
+    return model
+
+def GetModelTemplateMLPBinaryClassification(numberOfFeatures: int) -> Model:
+    '''
+    Returns a template for a Multi-Layer Perceptron (MLP) model for binary classification tasks.
+    '''
+    model = Sequential([
+        Dense(64, activation=LayerActivation.RELU.value, input_shape=(numberOfFeatures,)),
+        Dense(64, activation=LayerActivation.RELU.value),
+        Dense(1, activation=LayerActivation.SIGMOID.value)
+    ])
+
+    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.BINARY_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
+
+    return model
+
+def GetModelTemplateMLPMultiClassification(numberOfFeatures: int, num_classes: int) -> Model:
+    '''
+    Returns a template for a Multi-Layer Perceptron (MLP) model for multiple category classification tasks.
+    '''
+    model = Sequential([
+        Dense(64, activation=LayerActivation.RELU.value, input_shape=(numberOfFeatures,)),
+        Dense(64, activation=LayerActivation.RELU.value),
+        Dense(num_classes, activation=LayerActivation.SOFTMAX.value)
+    ])
+
+    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
+
+    return model
+
+def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int) -> Model:
+    '''
+    Returns a template for a Long Short-Term Memory (LSTM) model. Ideal for time series forecasting.
+    '''
+    model = Sequential([
+        LSTM(64, return_sequences=True, input_shape=(numberOfSteps, numberOfFeatures)),
+        Dropout(0.2),
+        LSTM(64, return_sequences=True),
+        Dropout(0.2),
+        LSTM(32, return_sequences=True),
+        Dropout(0.2),
+        Dense(25, activation=LayerActivation.RELU.value),
+        Dense(1)
+    ])
+
+    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
+
+    return model
+
+def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int) -> Model:
+    '''
+    Returns a template for a 1D Convolutional Neural Network (CNN) model. Ideal for time series forecasting.
+    '''
+    model = Sequential([
+        Conv1D(filters=64, kernel_size=2, activation=LayerActivation.RELU.value, input_shape=(numberOfSteps, numberOfFeatures)),
+        MaxPooling1D(pool_size=2),
+        Conv1D(filters=64, kernel_size=2, activation=LayerActivation.RELU.value),
+        MaxPooling1D(pool_size=2),
+        Flatten(),
+        Dense(50, activation=LayerActivation.RELU.value),
+        Dense(1)
+    ])
+
+    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
+
+    return model
+
+def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int) -> Model:
+    '''
+    Returns a template for a 2D Convolutional Neural Network (CNN) model. Ideal for image classification tasks.
+    '''
+    model = Sequential([
+        Conv2D(32, (3, 3), activation=LayerActivation.RELU.value, input_shape=(image_height, image_width, 3)),
+        MaxPooling2D((2, 2)),
+        Conv2D(64, (3, 3), activation=LayerActivation.RELU.value),
+        MaxPooling2D((2, 2)),
+        Conv2D(128, (3, 3), activation=LayerActivation.RELU.value),
+        MaxPooling2D((2, 2)),
+        Flatten(),
+        Dense(512, activation=LayerActivation.RELU.value),
+        Dropout(0.5),
+        Dense(num_classes, activation=LayerActivation.SOFTMAX.value)
+    ])
+
+    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
+
+    return model

@@ -1,23 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-from datetime import datetime
 from pandas import DataFrame
 from sklearn.pipeline import Pipeline
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import Model
 
 sys.path.append("./Libraries")
-from mltoolkit import *
-
-# Define the model
-def initModel() -> Model:
-    '''
-    Initializes model
-    '''
-    # see mltoolkit for available model templates
-    # or create your own model
-    pass
+from mltoolkit import datatransformers, modeltemplates, persistence
 
 # Define the preprocessing pipeline
 def createPreprocessingPipeline() -> Pipeline:
@@ -27,10 +17,19 @@ def createPreprocessingPipeline() -> Pipeline:
     pipeline = Pipeline([
         # Add preprocessing steps here
         # see mltoolkit for available transformers
+        # i.e.: ('encoder', datatransformers.transformer())    
     ])
 
     return pipeline;
 
+# Define the model
+def initModel() -> Model:
+    '''
+    Initializes model
+    '''
+    # see mltoolkit for available model templates
+    # or create your own model
+    return Sequential([])
 
 def csvToDataFrame(path: str) -> DataFrame:
     '''
@@ -38,14 +37,14 @@ def csvToDataFrame(path: str) -> DataFrame:
     '''
     return pd.read_csv(path)
 
-def fitPreprocessingPipeline(pipeline: Pipeline, data: DataFrame, persist: bool = False):
+def fitPreprocessingPipeline(pipeline: Pipeline, data: DataFrame, persist: bool = False) -> None:
     '''
     Fits pipeline using raw data. If persist is True, saves pipeline to disk
     '''
     pipeline.fit(data)
 
     if persist:
-        persistence.Save(pipeline)
+        persistence.savePipeline(pipeline)
 
 def processData(pipeline: Pipeline, data: DataFrame) -> DataFrame:
     '''
@@ -57,7 +56,7 @@ def splitData(data: DataFrame, target: str, test_size: float = 0.2) -> tuple[Dat
     '''
     Splits data into training and testing sets
     '''
-    datatransformers.splitData(data, target)
+    return datatransformers.splitData(data, target)
 
 def trainModel(model: Model, X_train: DataFrame, y_train:DataFrame, X_test: DataFrame, y_test: DataFrame, epochs: int=100, batchSize: int= 32, earlyStop: int= 10, persistModel: bool = False, persistTrainingData: bool = False) -> any:
     '''
@@ -67,10 +66,10 @@ def trainModel(model: Model, X_train: DataFrame, y_train:DataFrame, X_test: Data
     history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=epochs, batch_size=batchSize, callbacks=[earlyStop])
 
     if persistModel:
-        persistence.Save(model)
+        persistence.saveModel(model)
 
     if persistTrainingData:
-        persistence.SaveData(X_train, y_train)
+        persistence.saveData(X_train, y_train, X_test, y_test)
 
     return history
 
