@@ -7,7 +7,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import Model
 
 sys.path.append("./Libraries")
-from mltoolkit import datatransformers, modeltemplates, persistence
+from mltoolkit import datatransformers, modeltemplates, persistence, modelTunning
 
 # Define the preprocessing pipeline
 def createPreprocessingPipeline() -> Pipeline:
@@ -30,6 +30,16 @@ def initModel() -> Model:
     # see mltoolkit for available model templates
     # or create your own model
     return Sequential([])
+
+# tune model here
+def tuneModel(model: Model, X_train: DataFrame, y_train: DataFrame, X_test: DataFrame, y_test: DataFrame, ) -> Model:
+    '''
+    Tunes model
+    '''
+    hyperparameters = {
+        # Add hyperparameters here
+    }
+    return modelTunning.tuneModel(model, hyperparameters, X_train, y_train, X_test, y_test)
 
 def csvToDataFrame(path: str) -> DataFrame:
     '''

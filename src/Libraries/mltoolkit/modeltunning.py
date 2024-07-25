@@ -1,8 +1,9 @@
+from keras.models import Model
 from sklearn.model_selection import GridSearchCV
 from pandas import DataFrame
 from typing import Any, Dict, List
 
-def perform_grid_search(model: Any, param_grid: Dict[str, List[Any]], X_train: DataFrame, y_train: DataFrame, cv: int = 5, verbose: int = 2) -> GridSearchCV:
+def tuneModel(model: Model, param_grid: Dict[str, List[Any]], X_train: DataFrame, y_train: DataFrame, cv: int = 5, verbose: int = 2) -> GridSearchCV:
     """
     Perform grid search on the given model with the provided hyperparameters.
 
@@ -52,7 +53,6 @@ def perform_grid_search(model: Any, param_grid: Dict[str, List[Any]], X_train: D
     # Print the best parameters
     print(f"Best parameters found: {best_model.best_params_}")
     """
-
     grid_search = GridSearchCV(model, param_grid, refit=True, verbose=verbose, cv=cv)
     grid_search.fit(X_train, y_train)
 
