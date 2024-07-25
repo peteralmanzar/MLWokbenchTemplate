@@ -1,3 +1,4 @@
+from typing import List, Union
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
@@ -7,10 +8,17 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import Model
 
 sys.path.append("./Libraries")
-from mltoolkit import datatransformers, modeltemplates, modeltunning, parameters, persistence
+import parameters
+from mltoolkit import datatransformers, modeltemplates, modeltunning, persistence
 
 def createPreprocessingPipeline() -> Pipeline:
     return parameters.getPreprocessingPipeline()
+
+def getTarget() -> Union[str, List[str]]:
+    '''
+    Returns target column name
+    '''
+    return parameters.getTarget()
 
 def initModel() -> Model:
     '''
