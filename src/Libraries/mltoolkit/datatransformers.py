@@ -76,20 +76,17 @@ class PipelineImputer(BaseEstimator, TransformerMixin):
                 
             if self.strategy == ImputeStrategy.MEAN:
                 if X[column].dtype.kind in 'biufc':  # Check if the column is of numeric type
-                    print(f"Imputing column '{column}' with mean value")
                     X[column] = X[column].fillna(X[column].mean())
                 else:
                     raise ValueError(f"Mean imputation is not suitable for column '{column}' with dtype {X[column].dtype}")
             elif self.strategy == ImputeStrategy.MEDIAN:
                 if X[column].dtype.kind in 'biufc':  # Check if the column is of numeric type
-                    print(f"Imputing column '{column}' with median value")
                     X[column] = X[column].fillna(X[column].median())
                 else:
                     raise ValueError(f"Median imputation is not suitable for column '{column}' with dtype {X[column].dtype}")
             elif self.strategy == ImputeStrategy.MODE:
                 mode_value = X[column].mode()
                 if not mode_value.empty:
-                    print(f"Imputing column '{column}' with mode value")
                     X[column] = X[column].fillna(mode_value[0])
                 else:
                     raise ValueError(f"No mode value found for column '{column}'")
