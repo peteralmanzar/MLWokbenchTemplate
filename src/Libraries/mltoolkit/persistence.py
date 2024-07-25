@@ -4,7 +4,7 @@ from datetime import datetime
 from keras.models import Model
 from pandas import DataFrame
 from sklearn.pipeline import Pipeline
-from typing import Any, Union
+from typing import Any
 
 def savePipeline(pipeline: Pipeline) -> str:
     '''
@@ -21,7 +21,7 @@ def savePipeline(pipeline: Pipeline) -> str:
     joblib.dump(pipeline, fileName)
     return fileName
 
-def saveModel(model: Model) -> None:
+def saveModel(model: Model) -> str:
     '''
     Save model to file
 
@@ -36,23 +36,29 @@ def saveModel(model: Model) -> None:
     joblib.dump(model, fileName)
     return fileName
 
-def saveData(Xtrain: DataFrame, yTrain: DataFrame, X_test: DataFrame, y_test: DataFrame) -> None:
+def saveData(Xtrain: DataFrame, yTrain: DataFrame, X_test: DataFrame, y_test: DataFrame) -> tuple[str, str, str, str]:
     '''
     Save training data to file
 
     Parameters:
     Xtrain (DataFrame): Training data
     yTrain (DataFrame): Training target
+    X_test (DataFrame): Test data
+    y_test (DataFrame): Test target
 
     Returns:
-    Tuple[str, str]: File names of the saved files
+    tuple[str, str, str, str]: File names of the saved files
     '''
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
     xTrainFileName = f"./Data/Training/training_data_features_{current_time}.csv"
     yTrainFileName = f"./Data/Training/training_data_target_{current_time}.csv"
+    xTestFileName = f"./Data/Training/test_data_features_{current_time}.csv"
+    yTestFileName = f"./Data/Training/test_data_target_{current_time}.csv"
     Xtrain.to_csv(xTrainFileName, index=False)
     yTrain.to_csv(yTrainFileName, index=False)
-    return xTrainFileName, yTrainFileName
+    X_test.to_csv(xTestFileName, index=False)
+    y_test.to_csv(yTestFileName, index=False)
+    return xTrainFileName, yTrainFileName, xTestFileName, yTestFileName
 
 def LoadPipeline(fileName: str) -> Pipeline:
     '''
