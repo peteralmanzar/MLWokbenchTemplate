@@ -20,6 +20,7 @@
             - modeltunning
             - persistence
 - Where to Start
+- Troubleshooting
 
 ## Directories
 **src**
@@ -83,3 +84,7 @@ To get the rest of `Study_Guide.ipynb` working you need to define some functions
 Provide a pipeline by defining `getPreprocessingPipeline`. See `datatransformers.py` for a list of custom transformers that do common data preprocessing tasks. 
 Provide a model by defining `getModel`. See `modeltemplates.py` for a list of pre built model templates.
 Provide a target for the model to predict by defining `getTarget`.
+
+## Troubleshooting
+**reset pycache** 
+: Delete `__pycache__` directory then restart kernel. This will fix most issues within the `Study_Guide.ipynb`. Common symtom is updated `.py` file changes do not reflect in the `Study_Guide.ipynb`.
