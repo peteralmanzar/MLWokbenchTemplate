@@ -1,7 +1,8 @@
-from typing import List, Union
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 import sys
+from typing import List, Tuple, Union
 from pandas import DataFrame
 from sklearn.pipeline import Pipeline
 from tensorflow.keras.callbacks import EarlyStopping
@@ -54,11 +55,15 @@ def processData(pipeline: Pipeline, data: DataFrame) -> DataFrame:
     '''
     return pipeline.transform(data)
 
-def splitData(data: DataFrame, target: str, test_size: float = 0.2) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
+def splitData(data: Union[DataFrame, List[Tuple[DataFrame, np.ndarray]]], targetColumns: Union[str, List[str]], test_size: float = 0.2) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     '''
     Splits data into training and testing sets
     '''
-    return datatransformers.splitData(data, target)
+    if isinstance(data, DataFrame):
+        return datatransformers.splitData(data, targetColumns, test_size=test_size)
+    else:
+        X_train, X_test, y_train, y_test = datatransformers.splitSequencedData(data, targetColumns, test_size=test_size)
+        return X_train, X_test, y_train, y_test
 
 def trainModel(model: Model, X_train: DataFrame, y_train:DataFrame, X_test: DataFrame, y_test: DataFrame, epochs: int=100, batchSize: int= 32, earlyStop: int= 10, persistModel: bool = False, persistTrainingData: bool = False) -> any:
     '''

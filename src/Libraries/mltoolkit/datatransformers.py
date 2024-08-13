@@ -26,11 +26,11 @@ class PipelineOneHotEncoder(BaseEstimator, TransformerMixin):
     Returns
     -------
     DataFrame
-        A new DataFrame with the encoded columns
+        A new DataFrame with the specified columns encoded.
     """
 
     def __init__(self, columns: List[str]):
-        self.columns = columns
+        self.columns: List[str] = columns
         self.encoder = SklearnOneHotEncoder(sparse=False, drop='first')
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineOneHotEncoder':
@@ -63,8 +63,8 @@ class PipelineImputer(BaseEstimator, TransformerMixin):
         A new DataFrame with the specified columns imputed.
     """
     def __init__(self, strategy: ImputeStrategy, columns: List[str]):
-        self.strategy = strategy
-        self.columns = columns
+        self.strategy: ImputeStrategy = strategy
+        self.columns: List[str] = columns
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineImputer':
         return self
@@ -115,7 +115,7 @@ class PipelineFeatureDropper(BaseEstimator, TransformerMixin):
         columns : list
             A list of column names to drop.
         '''
-        self.columns = columns
+        self.columns: List[str] = columns
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineFeatureDropper':
         return self
@@ -140,7 +140,7 @@ class PipelineFeatureStandardScaler(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, columns: List[str]):
-        self.columns = columns
+        self.columns: List[str] = columns
         self.scaler = StandardScaler()
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineFeatureStandardScaler':
@@ -168,8 +168,8 @@ class PipelineDateSpliter(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, columns: List[str], dropColumns: bool = True):
-        self.columns = columns
-        self.dropColumns = dropColumns
+        self.columns: List[str] = columns
+        self.dropColumns: bool = dropColumns
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineDateSpliter':
         return self
@@ -181,7 +181,7 @@ class PipelineDateSpliter(BaseEstimator, TransformerMixin):
             X[column + "_month"] = X[column].dt.month
             X[column + "_day"] = X[column].dt.day
             if self.dropColumns:
-                X = X.drop([column], axis=1)
+                X = X.drop([column], axis=1, errors='ignore')
         return X
 
 class PipelineIndexSetter(BaseEstimator, TransformerMixin):
@@ -201,7 +201,7 @@ class PipelineIndexSetter(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, index: str):
-        self.index = index
+        self.index: str = index
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineIndexSetter':
         return self
@@ -212,47 +212,59 @@ class PipelineIndexSetter(BaseEstimator, TransformerMixin):
 class PipelineSequencer(BaseEstimator, TransformerMixin):
     """
     PipelineSequencer is a custom transformer that creates sequences from a DataFrame.
-    It takes a column to use as the label and a sequence length as parameters.
+    It takes a list of column names to use as the target values and a sequence length as parameters.
 
     Parameters
     ----------
-    column : str
-        A column name to use as the label.
+    targetColumns : list
+        A list of column names to use as the target values.
     sequence_length : int
-        The length of the sequence to create.
+        The length of the sequences to create.
 
     Returns
     -------
     tuple
-        A tuple containing a list of DataFrames and a DataFrame.
+        A tuple containing the features and target values.
     """
 
-    def __init__(self, column: str, sequence_length: int = 60):
-        self.column = column
-        self.sequence_length = sequence_length
+    def __init__(self, targetColumns: List[str], sequence_length: int = 60):
+        self.targetColumns: List[str] = targetColumns
+        self.sequence_length: int = sequence_length
 
     def fit(self, X: DataFrame, y: Union[DataFrame, None] = None) -> 'PipelineSequencer':
         return self
     
-    def transform(self, X: DataFrame) -> Tuple[List[DataFrame], DataFrame]:
-        return self.create_sequences(X)
+    def transform(self, X: DataFrame) -> List[Tuple[DataFrame, np.ndarray]]:
+        return self.create_sequences(X) 
         
-    def create_sequences(self, data: DataFrame) -> Tuple[List[DataFrame], DataFrame]:
+    def create_sequences(self, data: DataFrame) -> List[Tuple[DataFrame, np.ndarray]]:
         sequencedX = []
         sequencedy = []
         for i in range(self.sequence_length, len(data)):
             sequence_df = data.iloc[i-self.sequence_length:i].copy()
             sequencedX.append(sequence_df)
-            sequencedy.append(data.iloc[i][self.column])
-                        
-        label_df = pd.DataFrame(sequencedy, columns=['label'])
-        return sequencedX, label_df
-    
-def splitData(data: DataFrame, target: str, test_size: float = 0.2, seed: int = 42) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
-    X = data.drop(target, axis=1)
-    y = data[target]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seed, stratify=y)
-    return X_train, X_test, y_train, y_test
+            sequencedy.append(data.iloc[i][self.targetColumns])
 
-def dataSplitToNumpyArray(X_train: DataFrame, X_test: DataFrame, y_train: DataFrame, y_test: DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    return X_train.to_numpy(), X_test.to_numpy(), y_train.to_numpy(), y_test.to_numpy()
+        target_df = pd.DataFrame(sequencedy, columns=self.targetColumns)
+        X = [(features, target) for features, target in zip(sequencedX, target_df.values)]
+        
+        return X
+
+def splitData(data: DataFrame, target_columns: List[str], test_size: float = 0.2, seed: int = 42) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
+    X: DataFrame = data.drop(target_columns, axis=1)
+    y: DataFrame = data[target_columns]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seed, stratify=y, shuffle=False)
+    return X_train, X_test, y_train, y_test 
+
+def splitSequencedData(data: List[Tuple[DataFrame, np.ndarray]], target_columns: List[str], test_size: float = 0.2, seed: int = 42) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    train, test = train_test_split(data, test_size=test_size, random_state=seed, shuffle=False)
+
+    X_train = [item[0] for item in train]
+    y_train = [item[1] for item in train]
+    X_test = [item[0] for item in test]
+    y_test = [item[1] for item in test]
+    
+    X_train = [sequence.drop(columns=target_columns, errors='ignore') for sequence in X_train]
+    X_test = [sequence.drop(columns=target_columns, errors='ignore') for sequence in X_test]        
+
+    return np.array(X_train), np.array(X_test), np.array(y_train), np.array(y_test)
