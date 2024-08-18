@@ -7,36 +7,30 @@ from tensorflow.keras.models import Model
 sys.path.append("./Libraries")
 from mltoolkit import datatransformers, modeltemplates, persistence, modeltunning
 
-def getPreprocessingPipeline() -> Pipeline:
-    '''
-    Creates preprocessing pipeline
-    '''
-    pipeline = Pipeline([
+dataFilePath: str = './Data/Raw/data.csv'
+targetColumns: Union[str, List[str]] = 'target'
+randomStateSeed: int = 42
+
+pipelinePersistFitted: bool = False
+trainingDataPersist: bool = False
+
+splitStratisfy: bool = False
+splitTestSize: float = 0.2
+
+modelEpochs: int = 100
+modelBatchSize: int = 32
+modelEarlyStop: int = 10
+modelOptimizer: Optimizer = Optimizer.ADAM
+modelPersistTrained: bool = False
+
+preProcessingPipeLine: Pipeline = Pipeline([
         # Add preprocessing steps here
         # see mltoolkit for available transformers
         # i.e.: ('encoder', datatransformers.transformer())    
     ])
 
-    return pipeline;
+model: Model = modeltemplates.getModelTemplateNone()
 
-def getTarget() -> Union[str, List[str]]:
-    '''
-    Returns target column name
-    '''
-    return 'target'
-
-def getModel() -> Model:
-    '''
-    Initializes model
-    '''
-    # see mltoolkit for available model templates
-    # or create your own model
-    return Sequential([])
-
-def getHyperparameters() -> dict:
-    '''
-    Returns hyperparameters
-    '''
-    return {
-        # Add hyperparameters here
-    }
+hyperParameters: dict = {
+    # Add hyperparameters here
+}

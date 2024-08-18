@@ -12,41 +12,22 @@ sys.path.append("./Libraries")
 import parameters
 from mltoolkit import datatransformers, modeltemplates, modeltunning, persistence
 
-def createPreprocessingPipeline() -> Pipeline:
-    return parameters.getPreprocessingPipeline()
-
-def getTarget() -> Union[str, List[str]]:
-    '''
-    Returns target column name
-    '''
-    return parameters.getTarget()
-
-def initModel() -> Model:
-    '''
-    Initializes model
-    '''
-    return parameters.getModel()
-
-def tuneModel(model: Model, X_train: DataFrame, y_train: DataFrame, X_test: DataFrame, y_test: DataFrame, ) -> Model:
-    '''
-    Tunes model
-    '''
-    hyperparameters = parameters.getHyperparameters()
-    return modeltunning.tuneModel(model, hyperparameters, X_train, y_train, X_test, y_test)
-
-def csvToDataFrame(path: str) -> DataFrame:
+def csvToDataFrame() -> DataFrame:
     '''
     Reads csv file and returns DataFrame
     '''
-    return pd.read_csv(path)
+    return pd.read_csv(parameters.dataFilePath)
 
-def fitPreprocessingPipeline(pipeline: Pipeline, data: DataFrame, persist: bool = False) -> None:
+def createPreprocessingPipeline() -> Pipeline:
+    return parameters.getPreprocessingPipeline()
+
+def fitPreprocessingPipeline(pipeline: Pipeline, data: DataFrame) -> None:
     '''
     Fits pipeline using raw data. If persist is True, saves pipeline to disk
     '''
     pipeline.fit(data)
 
-    if persist:
+    if parameters.pipelinePersistFitted:
         persistence.savePipeline(pipeline)
 
 def processData(pipeline: Pipeline, data: DataFrame) -> DataFrame:
@@ -55,27 +36,39 @@ def processData(pipeline: Pipeline, data: DataFrame) -> DataFrame:
     '''
     return pipeline.transform(data)
 
-def splitData(data: Union[DataFrame, List[Tuple[DataFrame, np.ndarray]]], targetColumns: Union[str, List[str]], test_size: float = 0.2) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
+def splitData(data: Union[DataFrame, List[Tuple[DataFrame, np.ndarray]]]) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     '''
     Splits data into training and testing sets
     '''
     if isinstance(data, DataFrame):
-        return datatransformers.splitData(data, targetColumns, test_size=test_size)
+        return datatransformers.splitData(data, parameters.targetColumns, test_size=parameters.splitTestSize)
     else:
-        X_train, X_test, y_train, y_test = datatransformers.splitSequencedData(data, targetColumns, test_size=test_size)
+        X_train, X_test, y_train, y_test = datatransformers.splitSequencedData(data, parameters.targetColumns, test_size=parameters.splitTestSize)
         return X_train, X_test, y_train, y_test
 
-def trainModel(model: Model, X_train: DataFrame, y_train:DataFrame, X_test: DataFrame, y_test: DataFrame, epochs: int=100, batchSize: int= 32, earlyStop: int= 10, persistModel: bool = False, persistTrainingData: bool = False) -> any:
+def initModel() -> Model:
+    '''
+    Initializes model
+    '''
+    return parameters.getModel()
+
+def tuneModel(model: Model, X_train: DataFrame, y_train: DataFrame, X_test: DataFrame, y_test: DataFrame) -> Model:
+    '''
+    Tunes model
+    '''
+    return modeltunning.tuneModel(model, parameters.hyperParameters, X_train, y_train, X_test, y_test)
+
+def trainModel(model: Model, X_train: DataFrame, y_train: DataFrame, X_test: DataFrame, y_test: DataFrame) -> any:
     '''
     Trains model. If persist is True, saves model to disk
     '''
-    earlyStop = EarlyStopping(monitor='val_loss', patience=earlyStop, restore_best_weights=True, verbose=1)
-    history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=epochs, batch_size=batchSize, callbacks=[earlyStop])
+    earlyStop = EarlyStopping(monitor='val_loss', patience=parameters.modelEarlyStop, restore_best_weights=True, verbose=1)
+    history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=parameters.modelEpochs, batch_size=parameters.modelBatchSize, callbacks=[earlyStop])
 
-    if persistModel:
+    if parameters.modelPersistTrained:
         persistence.saveModel(model)
 
-    if persistTrainingData:
+    if parameters.trainingDataPersist:
         persistence.saveData(X_train, y_train, X_test, y_test)
 
     return history
@@ -92,7 +85,7 @@ def plotModelTrainingResults(history: any) -> None:
     plt.legend()
     plt.show()
 
-def evaluateModel(model: any, Xtest: DataFrame, yTest: DataFrame) -> tuple[float, float]:
+def evaluateModel(model: Model, Xtest: DataFrame, yTest: DataFrame) -> tuple[float, float]:
     '''
     Evaluates model
 

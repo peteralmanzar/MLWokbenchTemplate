@@ -51,7 +51,13 @@ class Metric(Enum):
     POISSON = 'poisson'
     COSINE_SIMILARITY = 'cosine_similarity'
 
-def GetModelTemplateMLPRegression(numberOfFeatures: int) -> Model:
+def getModelTemplateNone() -> Model:
+    '''
+    Returns a template for a None model.
+    '''
+    return None
+
+def GetModelTemplateMLPRegression(numberOfFeatures: int, optimizer: Optimizer = Optimizer.ADAM) -> Model:
     '''
     Returns a template for a Multi-Layer Perceptron (MLP) model for regression tasks.
     '''
@@ -61,11 +67,11 @@ def GetModelTemplateMLPRegression(numberOfFeatures: int) -> Model:
         Dense(1)
     ])
 
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_SQUARED_ERROR.value])
+    model.compile(optimizer=optimizer.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_SQUARED_ERROR.value])
 
     return model
 
-def GetModelTemplateMLPBinaryClassification(numberOfFeatures: int) -> Model:
+def GetModelTemplateMLPBinaryClassification(numberOfFeatures: int, optimizer: Optimizer = Optimizer.ADAM) -> Model:
     '''
     Returns a template for a Multi-Layer Perceptron (MLP) model for binary classification tasks.
     '''
@@ -75,11 +81,11 @@ def GetModelTemplateMLPBinaryClassification(numberOfFeatures: int) -> Model:
         Dense(1, activation=LayerActivation.SIGMOID.value)
     ])
 
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.BINARY_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
+    model.compile(optimizer=optimizer.value, loss=LossFunction.BINARY_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
 
     return model
 
-def GetModelTemplateMLPMultiClassification(numberOfFeatures: int, num_classes: int) -> Model:
+def GetModelTemplateMLPMultiClassification(numberOfFeatures: int, num_classes: int, optimizer: Optimizer = Optimizer.ADAM) -> Model:
     '''
     Returns a template for a Multi-Layer Perceptron (MLP) model for multiple category classification tasks.
     '''
@@ -89,11 +95,11 @@ def GetModelTemplateMLPMultiClassification(numberOfFeatures: int, num_classes: i
         Dense(num_classes, activation=LayerActivation.SOFTMAX.value)
     ])
 
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
+    model.compile(optimizer=optimizer.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
 
     return model
 
-def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int) -> Model:
+def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int, optimizer: Optimizer = Optimizer.ADAM) -> Model:
     '''
     Returns a template for a Long Short-Term Memory (LSTM) model. Ideal for time series forecasting.
     '''
@@ -108,11 +114,11 @@ def GetModelTemplateLSTM(numberOfSteps: int, numberOfFeatures: int) -> Model:
         Dense(1)
     ])
 
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
+    model.compile(optimizer=optimizer.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
 
     return model
 
-def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int) -> Model:
+def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int, optimizer: Optimizer = Optimizer.ADAM) -> Model:
     '''
     Returns a template for a 1D Convolutional Neural Network (CNN) model. Ideal for time series forecasting.
     '''
@@ -126,11 +132,11 @@ def GetModelTemplate1DCNN(numberOfSteps: int, numberOfFeatures: int) -> Model:
         Dense(1)
     ])
 
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
+    model.compile(optimizer=optimizer.value, loss=LossFunction.MEAN_SQUARED_ERROR.value, metrics=[Metric.MEAN_ABSOLUTE_ERROR.value])
 
     return model
 
-def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int) -> Model:
+def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int, optimizer: Optimizer = Optimizer.ADAM) -> Model:
     '''
     Returns a template for a 2D Convolutional Neural Network (CNN) model. Ideal for image classification tasks.
     '''
@@ -147,6 +153,6 @@ def GetModelTemplate2DCNN(image_height: int, image_width: int, num_classes: int)
         Dense(num_classes, activation=LayerActivation.SOFTMAX.value)
     ])
 
-    model.compile(optimizer=Optimizer.ADAM.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
+    model.compile(optimizer=optimizer.value, loss=LossFunction.CATEGORICAL_CROSSENTROPY.value, metrics=[Metric.ACCURACY.value])
 
     return model
