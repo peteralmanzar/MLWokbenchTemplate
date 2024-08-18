@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from tensorflow.keras.models import Model
 
 sys.path.append("./Libraries")
-from mltoolkit import datatransformers, modeltemplates, persistence, modeltunning
+from mltoolkit import datatransformers, modeltemplates, persistence
 
 dataFilePath: str = './Data/Raw/data.csv'
 targetColumns: Union[str, List[str]] = 'target'
