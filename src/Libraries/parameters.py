@@ -7,30 +7,30 @@ from tensorflow.keras.models import Model
 sys.path.append("./Libraries")
 from mltoolkit import datatransformers, modeltemplates, persistence
 
-dataFilePath: str = './Data/Raw/data.csv'
-targetColumns: Union[str, List[str]] = 'target'
-randomStateSeed: int = 42
+class MlWorkbenchParameters:
+    def __init__(self) -> None:
+        self.dataFilePath: str = "./"
+        self.targetColumns: Union[str, List[str]] = ""
+        self.randomStateSeed: int = 42
 
-pipelinePersistFitted: bool = False
-trainingDataPersist: bool = False
+        self.pipelinePersistFitted: bool = False    
+        self.trainingDataPersist: bool = False
 
-splitStratisfy: bool = False
-splitTestSize: float = 0.2
+        self.splitStratisfy: bool = False
+        self.splitTestSize: float = 0.2
 
-modelEpochs: int = 100
-modelBatchSize: int = 32
-modelEarlyStop: int = 10
-modelOptimizer: Optimizer = Optimizer.ADAM
-modelPersistTrained: bool = False
+        self.modelEpochs: int = 100
+        self.modelBatchSize: int = 32
+        self.modelEarlyStop: int = 10
+        self.modelOptimizer: Optimizer = Optimizer.ADAM
+        self.modelPersistTrained: bool = False
 
-preProcessingPipeLine: Pipeline = Pipeline([
-        # Add preprocessing steps here
-        # see mltoolkit for available transformers
-        # i.e.: ('encoder', datatransformers.transformer())    
-    ])
+        self.preProcessingPipeLine: Pipeline = Pipeline([
+            # Add preprocessing steps here
+            # see mltoolkit for available transformers
+            # i.e.: ('encoder', datatransformers.transformer())    
+        ])
 
-model: Model = modeltemplates.getModelTemplateNone()
+        self.model: Model = modeltemplates.getModelTemplateNone()
 
-hyperParameters: dict = {
-    # Add hyperparameters here
-}
+        self.hyperParameters: dict = None
