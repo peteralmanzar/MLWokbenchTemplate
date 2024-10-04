@@ -22,7 +22,7 @@ class MlWorkbenchParameters:
         self.modelEpochs: int = 100
         self.modelBatchSize: int = 32
         self.modelEarlyStop: int = 10
-        self.modelOptimizer: Optimizer = Optimizer.ADAM
+        self.modelOptimizer: modeltemplates.Optimizer = modeltemplates.Optimizer.ADAM
         self.modelPersistTrained: bool = False
 
         self.preProcessingPipeLine: Pipeline = Pipeline([
