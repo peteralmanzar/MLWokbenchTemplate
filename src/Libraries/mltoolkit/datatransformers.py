@@ -181,7 +181,7 @@ class PipelineDateSpliter(BaseEstimator, TransformerMixin):
             X[column + "_month"] = X[column].dt.month
             X[column + "_day"] = X[column].dt.day
             if self.dropColumns:
-                X = X.drop([column], axis=1, errors='ignore')
+                X = X.drop(column, axis=1, errors='ignore')
         return X
 
 class PipelineIndexSetter(BaseEstimator, TransformerMixin):
